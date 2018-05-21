@@ -2,7 +2,6 @@
  * @author
  * @license MIT
  */
-
 import Candy from '../Candy';
 import InvalidConfigException from './InvalidConfigException';
 

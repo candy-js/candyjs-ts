@@ -2,7 +2,6 @@
  * @author
  * @license MIT
  */
-
 import * as http from 'http';
 
 import Hook from './core/Hook';
