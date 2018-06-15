@@ -96,10 +96,11 @@ export default class Request extends CoreRequest {
     }
 
     /**
+     * 获取 cookie
      *
      * @param {http.ServerRequest} request 请求对象
      * @param {String} name cookie name
-     * @return {String}
+     * @see Cookie.getCookie
      */
     public static getCookie(request: http.ServerRequest, name: string): string {
         return Cookie.getCookie(request, name);
@@ -147,7 +148,7 @@ export default class Request extends CoreRequest {
      * 获取 post 参数
      *
      * @param {String} param 参数名
-     * @return {String | null | undefined | ''}
+     * @return {String | null | undefined}
      */
     public getParameter(param: string): any {
         if(undefined === this.request['body']) {
@@ -161,10 +162,48 @@ export default class Request extends CoreRequest {
      * 获取 cookie
      *
      * @param {String} name cookie name
-     * @return {String}
+     * @see Cookie.getCookie
      */
     public getCookie(name: string): string {
         return Cookie.getCookie(this.request, name);
+    }
+
+    /**
+     * 获取引用网址
+     *
+     * @return {String | null}
+     */
+    public getReferer(request: http.ServerRequest): any {
+        if(undefined !== this.request.headers.referer) {
+            return this.request.headers.referer;
+        }
+
+        return null;
+    }
+
+    /**
+     * 获取 URI 协议和主机部分
+     *
+     * @return {String}
+     */
+    public getHostInfo(): string {
+        let protocol = undefined !== this.request.socket['encrypted']
+            || 'https' === this.request.headers['x-forwarded-protocol']
+                ? 'https'
+                : 'http';
+
+        let host = protocol + '://' + this.request.headers.host;
+
+        return host;
+    }
+
+    /**
+     * 获取当前网址 不包含锚点部分
+     *
+     * @return {String}
+     */
+    public getCurrent(): string {
+        return this.getHostInfo() + this.request.url;
     }
 
 }

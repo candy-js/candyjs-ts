@@ -4,6 +4,7 @@
  */
 import * as http from 'http';
 
+import Request from './Request';
 import StringHelper from '../helpers/StringHelper';
 
 /**
@@ -12,56 +13,6 @@ import StringHelper from '../helpers/StringHelper';
  * @see https://tools.ietf.org/html/rfc1738
  */
 export default class URL {
-
-    /**
-     * @property {Object} request
-     */
-    public request: http.ServerRequest;
-
-    /**
-     * constructor
-     */
-    constructor(request: http.ServerRequest) {
-        this.request = request;
-    }
-
-    /**
-     * 获取引用网址
-     *
-     * @return {String}
-     */
-    public getReferer(): string {
-        if(undefined !== this.request.headers['referer']) {
-            return <string>this.request.headers['referer'];
-        }
-
-        return '';
-    }
-
-    /**
-     * 获取 URI 协议和主机部分
-     *
-     * @return {String}
-     */
-    public getHostInfo(): string {
-        let protocol = undefined !== this.request.socket['encrypted']
-                || this.request.headers['x-forwarded-protocol'] === 'https'
-            ? 'https'
-            : 'http';
-
-        let host = protocol + '://' + this.request.headers.host;
-
-        return host;
-    }
-
-    /**
-     * 获取当前网址 不包含锚点部分
-     *
-     * @return {String}
-     */
-    public getCurrent(): string {
-        return this.getHostInfo() + this.request.url;
-    }
 
     /**
      * 创建一个 url
@@ -78,8 +29,8 @@ export default class URL {
      * @param {Object} params
      * @return {String}
      */
-    public to(url: string, params: any = null): string {
-        let host = this.getHostInfo();
+    public static to(request: http.ServerRequest, url: string, params: any = null): string {
+        let host = new Request(request).getHostInfo();
         let query = '';
         let anchor = '';
 
