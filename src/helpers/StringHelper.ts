@@ -101,7 +101,7 @@ export default class StringHelper {
         };
 
         // 放到最前面 防止多次转义
-        if(doubleEncode !== false) {
+        if(false !== doubleEncode) {
             str = str.replace(/&/g, '&amp;');
         }
 
