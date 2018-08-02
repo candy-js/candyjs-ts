@@ -84,7 +84,7 @@ export default class Component {
      * ```
      * {
      *     'behaviorName': {
-     *         'class': 'BehaviorClassName',
+     *         'classPath': 'BehaviorClassName',
      *         'property1': 'value1',
      *         'property2': 'value2'
      *     },

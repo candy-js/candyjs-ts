@@ -15,7 +15,7 @@ import ImplTarget from '../ImplTarget';
  * ```
  * 'cache': {
  *      'file': {
- *          'class': 'candy/cache/file/Target',
+ *          'classPath': 'candy/cache/file/Target',
  *          'cachePath': '...'
  *      }
  * }

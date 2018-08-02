@@ -19,7 +19,7 @@ export default class Fate {
      * or a Object config
      *
      * {
-     *      'class': 'app/some/Class',
+     *      'classPath': 'app/some/Class',
      *      'property': 'value'
      * }
      * ```
@@ -34,7 +34,7 @@ export default class Fate {
      * {
      *     'u': 'app/controllers/user/IndexController',
      *     'account': {
-     *         'class': 'app/controllers/user/IndexController',
+     *         'classPath': 'app/controllers/user/IndexController',
      *         'property': 'value'
      *     }
      * }

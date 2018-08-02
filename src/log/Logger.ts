@@ -75,8 +75,8 @@ export default class Logger {
             this.flushInterval = settings.flushInterval;
         }
         for(let target in settings.targets) {
-            if(undefined !== settings.targets[target]['class']) {
-                let clazz = Candy.createObject(settings.targets[target]['class'],
+            if(undefined !== settings.targets[target]['classPath']) {
+                let clazz = Candy.createObject(settings.targets[target]['classPath'],
                     settings.targets[target]);
                 clazz.on(ImplTarget.EVENT_FLUSH, clazz);
 

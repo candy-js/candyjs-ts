@@ -17,7 +17,7 @@ import TimeHelper from '../../helpers/TimeHelper';
  * 'log': {
  *     'targets': {
  *         'file': {
- *             'class': 'candy/log/file/Target',
+ *             'classPath': 'candy/log/file/Target',
  *             'logPath': __dirname + '/logs'
  *         },
  *         'other': {...}
