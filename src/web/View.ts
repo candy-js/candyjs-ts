@@ -36,7 +36,7 @@ export default class View extends CoreView {
         } else {
             path = app.getAppPath()
                 + '/views/'
-                + ('' === context['subRoute'] ? '.' : context['subRoute'])
+                + ('' === context['viewPath'] ? '.' : context['viewPath'])
                 + '/'
                 + view + View.defaultViewExtension;
         }

@@ -95,13 +95,13 @@ export default class Fate {
          */
         let controllerId: string = '';
         /**
-         * @var {String} subRoute 子目录
+         * @var {String} viewPath 子目录
          *
-         * eg. subRoute = ''  ->  app/views/xxx.html
-         * eg. subRoute = 'subdir'  ->  app/views/subdir/xxx.html
+         * eg. viewPath = ''  ->  app/views/xxx.html
+         * eg. viewPath = 'subdir'  ->  app/views/subdir/xxx.html
          *
          */
-        let subRoute: string = '';
+        let viewPath: string = '';
 
         route = StringHelper.lTrimChar(route, '/');
 
@@ -135,11 +135,11 @@ export default class Fate {
         }
 
         // 保存前缀
-        subRoute = id;
+        viewPath = id;
 
         // 保存当前控制器标识
         if( -1 !== (pos = route.lastIndexOf('/')) ) {
-            subRoute = subRoute + '/' + route.substring(0, pos);
+            viewPath = viewPath + '/' + route.substring(0, pos);
 
             controllerId = route.substring(pos + 1);
         }
@@ -155,7 +155,7 @@ export default class Fate {
             return Candy.createObject(this.routesMap[id], {
                 moduleId: moduleId,
                 controllerId: controllerId,
-                subRoute: subRoute
+                viewPath: viewPath
             });
         }
 
@@ -169,20 +169,20 @@ export default class Fate {
             return Candy.createObject(clazz, {
                 moduleId: moduleId,
                 controllerId: controllerId,
-                subRoute: subRoute
+                viewPath: viewPath
             });
         }
 
         clazz = this.defaultControllerNamespace
             + '/'
-            + subRoute
+            + viewPath
             + '/'
             + StringHelper.ucFirst(controllerId) + 'Controller';
 
         return Candy.createObject(clazz, {
             moduleId: moduleId,
             controllerId: controllerId,
-            subRoute: subRoute
+            viewPath: viewPath
         });
     }
 
