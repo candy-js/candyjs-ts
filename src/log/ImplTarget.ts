@@ -8,7 +8,7 @@ import ITarget from './ITarget';
 /**
  * 日志抽象层
  */
-abstract class ImplTarget extends Event implements ITarget {
+export default abstract class ImplTarget extends Event implements ITarget {
 
     /**
      * @property {String} EVENT_FLUSH 事件
@@ -32,13 +32,13 @@ abstract class ImplTarget extends Event implements ITarget {
      * @param {Array} param 日志信息
      */
     trigger(eventName: string, param: any[]): void {
-        if(undefined !== this.handlers[eventName]) {
-            for(let handler of this.handlers[eventName]) {
-                handler.flush(param);
-            }
+        if(undefined === this.handlers[eventName]) {
+            return;
+        }
+
+        for(let handler of this.handlers[eventName]) {
+            handler.flush(param);
         }
     }
 
 }
-
-export default ImplTarget;

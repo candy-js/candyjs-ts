@@ -11,6 +11,9 @@ import CoreController from '../core/Controller';
 import Request from './Request';
 import InvalidRouteException from '../core/InvalidRouteException';
 
+import AppConfig from '../IAppConfig';
+import CoreExceptionHandler from '../core/ExceptionHandler';
+
 /**
  * web 应用
  */
@@ -24,7 +27,7 @@ export default class Application extends CoreApp {
     /**
      * @inheritdoc
      */
-    constructor(config: any) {
+    constructor(config: AppConfig) {
         super(config);
 
         this.defaultExceptionHandler = 'candy/web/ExceptionHandler';
@@ -44,7 +47,7 @@ export default class Application extends CoreApp {
 
         // 是否继承自框架控制器
         if( !(controller instanceof CoreController) ) {
-            controller['run'](request, response);
+            (controller as any).run(request, response);
 
             return;
         }
@@ -56,11 +59,11 @@ export default class Application extends CoreApp {
      * @inheritdoc
      */
     public handlerException(response: http.ServerResponse, exception: Exception) {
-        let handler = Candy.createObject('' === this.exceptionHandler
+        let handler: CoreExceptionHandler = Candy.createObject('' === this.exceptionHandler
             ? this.defaultExceptionHandler
             : this.exceptionHandler);
 
-        (<CoreApp>handler).handlerException(response, exception);
+        handler.handlerException(response, exception);
     }
 
 }

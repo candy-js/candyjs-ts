@@ -3,12 +3,13 @@
  * @license MIT
  */
 import Candy from '../Candy';
+import Event from './Event';
 import Behavior from './Behavior';
 
 /**
  * 组件是实现 属性 (property) 行为 (behavior) 事件 (event) 的基类
  */
-export default class Component {
+export default class Component extends Event {
 
     /**
      * @property {Object} eventsMap the attached event handlers
@@ -40,6 +41,8 @@ export default class Component {
      * constructor
      */
     constructor() {
+        super();
+
         this.eventsMap = {};
         this.behaviorsMap = {};
 
@@ -156,70 +159,6 @@ export default class Component {
         // 行为类可以监听组件的事件并处理
         (<Behavior>behavior).listen(this);
         this.behaviorsMap[name] = behavior;
-    }
-
-    /**
-     * 注册事件
-     *
-     * @param {String} eventName 事件名称
-     * @param {Function} handler 回调函数
-     */
-    public on(eventName, handler): void {
-        if(undefined === this.eventsMap[eventName]) {
-            this.eventsMap[eventName] = [];
-        }
-
-        this.eventsMap[eventName].push(handler);
-    }
-
-    /**
-     * 注销事件
-     *
-     * @param {String} eventName 事件名称
-     * @param {Function} handler 回调函数
-     */
-    public off(eventName, handler): void {
-        if(undefined !== this.eventsMap[eventName]) {
-            if(undefined === handler) {
-                delete this.eventsMap[eventName];
-
-            } else {
-                for(let i=0,len=this.eventsMap[eventName].length; i<len; i++) {
-                    if(handler === this.eventsMap[eventName][i]) {
-                        this.eventsMap[eventName].splice(i, 1);
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * 触发
-     *
-     * @param {String} eventName 事件名称
-     * @param {Array} param 参数
-     */
-    public trigger(eventName, param): void {
-        if(undefined !== this.eventsMap[eventName]) {
-            for(let i=0,len=this.eventsMap[eventName].length; i<len; i++) {
-                undefined === param ? this.eventsMap[eventName][i]() :
-                    this.eventsMap[eventName][i].apply(null, param);
-            }
-        }
-    }
-
-    /**
-     * 触发
-     *
-     * @param {String} eventName 事件名称
-     * @param {any} params 参数
-     */
-    public triggerWithRestParams(eventName, ...params): void {
-        if(undefined !== this.eventsMap[eventName]) {
-            for(let i=0,len=this.eventsMap[eventName].length; i<len; i++) {
-                this.eventsMap[eventName][i](...params);
-            }
-        }
     }
 
 }

@@ -6,10 +6,12 @@ import Candy from '../Candy';
 import Fate from './Fate';
 import InvalidConfigException from './InvalidConfigException';
 
+import AppConfig from '../IAppConfig';
+
 /**
  * 应用基类
  */
-export default class Application extends Fate {
+export default abstract class Application extends Fate {
 
     /**
      * @property {String} encoding 编码
@@ -27,16 +29,22 @@ export default class Application extends Fate {
     public exceptionHandler: string;
 
     /**
+     * @property {String} viewHandler 视图类
+     */
+    public viewHandler: string;
+
+    /**
      * constructor
      *
-     * @param {Object} config 配置信息
+     * @param {AppConfig} config 配置信息
      */
-    constructor(config: any) {
+    constructor(config: AppConfig) {
         super();
 
         this.encoding = 'UTF-8';
         this.debug = false;
         this.exceptionHandler = '';
+        this.viewHandler = '';
 
         Candy.app = this;
         this.init(config);
@@ -46,10 +54,10 @@ export default class Application extends Fate {
     /**
      * 初始化应用
      *
-     * @param {Object} config 应用配置
+     * @param {AppConfig} config 应用配置
      * @throws {InvalidConfigException} 当丢失必要配置项目时
      */
-    public init(config: any): void {
+    public init(config: AppConfig): void {
         if(undefined === config.id) {
             throw new InvalidConfigException('The "id" configuration is required');
         }
@@ -140,7 +148,7 @@ export default class Application extends Fate {
      * @param {Object} request
      * @param {Object} response
      */
-    public requestListener(request: any, response: any) {}
+    public abstract requestListener(request: any, response: any);
 
     /**
      * 异常处理
@@ -148,6 +156,6 @@ export default class Application extends Fate {
      * @param {Object} response 输出类
      * @param {Exception} exception 异常类
      */
-    public handlerException(response: any, exception: Error) {}
+    public abstract handlerException(response: any, exception: Error);
 
 }

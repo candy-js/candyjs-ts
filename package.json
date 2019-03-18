@@ -9,6 +9,7 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "@types/node": "^8.0.26"
+    "@types/node": "^8.0.26",
+    "typescript": "^3.3.3333"
   }
 }

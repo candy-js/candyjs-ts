@@ -8,7 +8,7 @@ import InvalidConfigException from './InvalidConfigException';
 /**
  * RESTful 基类
  */
-export default class Rest {
+export default abstract class Rest {
 
     /**
      * @property {Boolean} debug 调试
@@ -59,7 +59,7 @@ export default class Rest {
      * @param {Object} request
      * @param {Object} response
      */
-    public requestListener(request, response) {}
+    public abstract requestListener(request, response);
 
     /**
      * 异常处理
@@ -67,6 +67,6 @@ export default class Rest {
      * @param {Object} response 输出类
      * @param {Exception} exception 异常类
      */
-    public handlerException(response, exception) {}
+    public abstract handlerException(response, exception);
 
 }

@@ -6,7 +6,7 @@
 /**
  * 视图
  */
-abstract class View {
+export default abstract class View {
 
     /**
      * @var {String} 默认视图文件后缀
@@ -52,5 +52,3 @@ abstract class View {
     public abstract getTemplateFromPath(path: string, callback: any): void;
 
 }
-
-export default View;

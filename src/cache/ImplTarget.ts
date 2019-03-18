@@ -7,7 +7,7 @@ import ITarget from './ITarget';
 /**
  * 缓存基类
  */
-abstract class ImplTarget implements ITarget {
+export default abstract class ImplTarget implements ITarget {
 
     /**
      * @inheritdoc
@@ -45,5 +45,3 @@ abstract class ImplTarget implements ITarget {
     public abstract delete(key: string, callback: any): void;
 
 }
-
-export default ImplTarget;

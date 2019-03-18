@@ -6,7 +6,7 @@
 /**
  * 异常错误处理基类
  */
-abstract class ExceptionHandler {
+export default abstract class ExceptionHandler {
 
     /**
      * 异常处理
@@ -17,5 +17,3 @@ abstract class ExceptionHandler {
     public abstract handlerException(response: any, exception: Error): void;
 
 }
-
-export default ExceptionHandler;

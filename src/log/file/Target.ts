@@ -18,7 +18,9 @@ import TimeHelper from '../../helpers/TimeHelper';
  *     'targets': {
  *         'file': {
  *             'classPath': 'candy/log/file/Target',
- *             'logPath': __dirname + '/logs'
+ *             'logPath': '@runtime/logs',
+ *             'logFile': 'system.log',
+ *             'maxFileSize': 10240
  *         },
  *         'other': {...}
  *     },
@@ -30,19 +32,19 @@ import TimeHelper from '../../helpers/TimeHelper';
 export default class Target extends ImplTarget {
 
     /**
-     * @property {any} config 配置
-     */
-    public config: any;
-
-    /**
-     * @property {String} fileExtension
-     */
-    public fileExtension: string;
-
-    /**
-     * @property {String} logPath 日志路径
+     * @property {String} absolute path of log file. default at runtime directory of the application
      */
     public logPath: string;
+
+    /**
+     * @property {String} log file name
+     */
+    public logFile: string;
+
+    /**
+     * @property {Number} maxFileSize maximum log file size in KB
+     */
+    public maxFileSize: number;
 
     /**
      * constructor
@@ -50,56 +52,35 @@ export default class Target extends ImplTarget {
     constructor(config: any) {
         super();
 
-        this.config = config;
-
-        this.fileExtension = undefined === config.fileExtension
-            ? '.log'
-            : config.fileExtension;
-
         this.logPath = undefined === config.logPath
             ? Candy.getPathAlias('@runtime/logs')
             : config.logPath;
+
+        this.logFile = undefined === config.logFile
+            ? 'system.log'
+            : config.logFile;
+
+        this.maxFileSize = undefined === config.maxFileSize
+            ? 10240
+            : config.maxFileSize;
     }
 
     /**
      * @inheritdoc
      */
     public flush(messages: any[]): void {
-        let msg = this.formatMessage(messages);
-        let file = this.generateFile();
-
         // 检查目录
         fs.access(this.logPath, fs.constants.R_OK | fs.constants.W_OK, (err) => {
             if(null === err) {
-                fs.appendFile(file, msg, Candy.app.encoding, (err) => {});
+                this.writeLog(messages);
 
                 return;
             }
 
             FileHelper.createDirectory(this.logPath, 0o777, (err) => {
-                fs.appendFile(file, msg, Candy.app.encoding, (err) => {});
+                this.writeLog(messages);
             });
         });
-    }
-
-    /**
-     * 生成日志文件名
-     */
-    private generateFile(): string {
-        if(undefined !== this.config.logFile) {
-            return this.logPath + '/' + this.config.logFile;
-        }
-
-        var date = new Date();
-
-        return this.logPath
-            + '/'
-            + date.getFullYear()
-            + '-'
-            + (date.getMonth() + 1)
-            + '-'
-            + date.getDate()
-            + this.fileExtension;
     }
 
     /**
@@ -118,4 +99,38 @@ export default class Target extends ImplTarget {
 
         return msg;
     }
+
+    /**
+     * 写日志
+     */
+    private writeLog(messages) {
+        let msg = this.formatMessage(messages);
+        let file = this.logPath + '/' + this.logFile;
+
+        // check file exists
+        fs.access(file, fs.constants.F_OK, (err) => {
+            // file not exists
+            if(null !== err) {
+                fs.writeFile(file, msg, (err) => {});
+
+                return;
+            }
+
+            // check file size
+            fs.stat(file, (err, stats) => {
+                if(stats.size > this.maxFileSize * 1024) {
+                    let newFile = file + TimeHelper.format('ymdhis');
+
+                    fs.rename(file, newFile, (err) => {
+                        fs.appendFile(file, msg, (err) => {});
+                    });
+
+                    return;
+                }
+
+                fs.appendFile(file, msg, (err) => {});
+            });
+        });
+    }
+    
 }

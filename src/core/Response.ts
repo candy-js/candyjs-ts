@@ -7,7 +7,7 @@ import * as http from 'http';
 /**
  * server response
  */
-export default class Response {
+export default abstract class Response {
 
     public response: http.ServerResponse;
 
@@ -25,6 +25,6 @@ export default class Response {
      *
      * @param {String | Buffer} content
      */
-    public send(content: string | Buffer): void {}
+    public abstract send(content: string | Buffer): void;
 
 }

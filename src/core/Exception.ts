@@ -6,7 +6,7 @@
 /**
  * 异常
  */
-export default class Exception extends Error {
+export default abstract class Exception extends Error {
 
     /**
      * constructor

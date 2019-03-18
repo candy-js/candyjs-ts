@@ -6,10 +6,12 @@ import * as http from 'http';
 
 import Component from './Component';
 
+import View from './View';
+
 /**
  * 控制器基类
  */
-export default class Controller extends Component {
+export default abstract class Controller extends Component {
 
     /**
      * @property {String} EVENT_BEFORE_ACTIONCALL
@@ -75,13 +77,13 @@ export default class Controller extends Component {
      * @param {http.ServerRequest} request
      * @param {http.ServerResponse} response
      */
-    public run(request: http.ServerRequest, response: http.ServerResponse) {}
+    public abstract run(request: http.ServerRequest, response: http.ServerResponse);
 
     /**
      * 获取视图类
      *
      * @return {Object}
      */
-    getView() {}
+    public abstract getView(): View;
 
 }

@@ -10,6 +10,8 @@ import CoreApp from './core/Application';
 import WebApp from './web/Application';
 import InvalidConfigException from './core/InvalidConfigException';
 
+import AppConfig from './IAppConfig';
+
 /**
  * 入口
  */
@@ -21,9 +23,9 @@ export default class CandyJs {
     public static Candy: Candy = Candy;
 
     /**
-     * @property {Object} config 配置信息
+     * @property {AppConfig} config 配置信息
      */
-    public config: any;
+    public config: AppConfig;
 
     /**
      * @property {http.Serve} server 配置信息
@@ -38,9 +40,9 @@ export default class CandyJs {
     /**
      * constructor
      *
-     * @param {Object} config 配置信息
+     * @param {AppConfig} config 配置信息
      */
-    constructor(config: any) {
+    constructor(config: AppConfig) {
         if(undefined === config) {
             throw new InvalidConfigException('The app config is required');
         }

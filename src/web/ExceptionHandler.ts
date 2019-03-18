@@ -15,7 +15,7 @@ export default class ExceptionHandler extends CoreExceptionHandler {
     /**
      * @inheritdoc
      */
-    handlerException(response: http.ServerResponse, exception: Error) {
+    handlerException(response: http.ServerResponse, exception: Error): void {
         response.setHeader('Content-Type', 'text/plain');
         response.writeHead(500);
 

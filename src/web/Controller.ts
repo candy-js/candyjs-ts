@@ -4,6 +4,7 @@
  */
 import Candy from '../Candy';
 import CoreController from '../core/Controller';
+
 import View from './View';
 
 /**
@@ -14,7 +15,7 @@ export default class Controller extends CoreController {
     /**
      * @property {String} viewHandler
      */
-    public viewHandler: string;
+    public defaultViewHandler: string;
 
     /**
      * @property {View} view
@@ -27,7 +28,7 @@ export default class Controller extends CoreController {
     constructor(context) {
         super(context);
 
-        this.viewHandler = 'candy/web/View';
+        this.defaultViewHandler = 'candy/web/View';
         this.view = null;
     }
 
@@ -39,9 +40,17 @@ export default class Controller extends CoreController {
             return this.view;
         }
 
-        this.view = <View>Candy.createObject(this.viewHandler, this.context);
+        this.view = <View>Candy.createObject(
+            '' === Candy.app.viewHandler
+            ? this.defaultViewHandler
+            : Candy.app.viewHandler, this.context);
 
         return this.view;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public run() {}
 
 }
