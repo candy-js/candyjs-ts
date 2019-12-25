@@ -11,7 +11,6 @@ import CoreController from '../core/Controller';
 import Request from './Request';
 import InvalidRouteException from '../core/InvalidRouteException';
 
-import AppConfig from '../IAppConfig';
 import CoreExceptionHandler from '../core/ExceptionHandler';
 
 /**
@@ -27,7 +26,7 @@ export default class Application extends CoreApp {
     /**
      * @inheritdoc
      */
-    constructor(config: AppConfig) {
+    constructor(config: any) {
         super(config);
 
         this.defaultExceptionHandler = 'candy/web/ExceptionHandler';

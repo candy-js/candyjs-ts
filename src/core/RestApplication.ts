@@ -8,7 +8,7 @@ import InvalidConfigException from './InvalidConfigException';
 /**
  * RESTful 基类
  */
-export default abstract class Rest {
+export default abstract class RestApplication {
 
     /**
      * @property {Boolean} debug 调试

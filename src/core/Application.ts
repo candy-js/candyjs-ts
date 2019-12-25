@@ -6,8 +6,6 @@ import Candy from '../Candy';
 import Fate from './Fate';
 import InvalidConfigException from './InvalidConfigException';
 
-import AppConfig from '../IAppConfig';
-
 /**
  * 应用基类
  */
@@ -36,9 +34,9 @@ export default abstract class Application extends Fate {
     /**
      * constructor
      *
-     * @param {AppConfig} config 配置信息
+     * @param {any} config 配置信息
      */
-    constructor(config: AppConfig) {
+    constructor(config: any) {
         super();
 
         this.encoding = 'UTF-8';
@@ -54,10 +52,10 @@ export default abstract class Application extends Fate {
     /**
      * 初始化应用
      *
-     * @param {AppConfig} config 应用配置
+     * @param {any} config 应用配置
      * @throws {InvalidConfigException} 当丢失必要配置项目时
      */
-    public init(config: AppConfig): void {
+    public init(config: any): void {
         if(undefined === config.id) {
             throw new InvalidConfigException('The "id" configuration is required');
         }

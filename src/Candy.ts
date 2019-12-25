@@ -2,7 +2,7 @@
  * @author
  * @license MIT
  */
-import Rest from './core/Rest';
+import Rest from './core/RestApplication';
 import CoreApp from './core/Application';
 import StringHelper from './helpers/StringHelper';
 

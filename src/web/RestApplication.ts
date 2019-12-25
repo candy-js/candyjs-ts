@@ -6,12 +6,12 @@ import * as http from 'http';
 
 import Candy from '../Candy';
 import Router from '../core/Router';
-import CoreRest from '../core/Rest';
+import CoreRest from '../core/RestApplication';
 import StringHelper from '../helpers/StringHelper';
 import InvalidCallException from '../core/InvalidCallException';
 import Request from './Request';
 
-export default class Rest extends CoreRest {
+export default class RestApplication extends CoreRest {
 
     /**
      * @property {String} separator class and method separate
@@ -87,7 +87,7 @@ export default class Rest extends CoreRest {
         }
 
         // handler is string
-        var pos = ret.handler.indexOf(Rest.separator);
+        var pos = ret.handler.indexOf(RestApplication.separator);
         var obj = null;
         if(-1 === pos) {
             obj = Candy.createObject(ret.handler);

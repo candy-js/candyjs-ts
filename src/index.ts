@@ -4,13 +4,7 @@
  */
 import * as http from 'http';
 
-import Candy from './Candy';
 import Hook from'./core/Hook';
-import CoreApp from './core/Application';
-import WebApp from './web/Application';
-import InvalidConfigException from './core/InvalidConfigException';
-
-import AppConfig from './IAppConfig';
 
 /**
  * 入口
@@ -18,38 +12,23 @@ import AppConfig from './IAppConfig';
 export default class CandyJs {
 
     /**
-     * handler
-     */
-    public static Candy: Candy = Candy;
-
-    /**
-     * @property {AppConfig} config 配置信息
-     */
-    public config: AppConfig;
-
-    /**
      * @property {http.Serve} server 配置信息
      */
     public server: http.Server;
 
     /**
-     * @property {CoreApp} app 配置信息
+     * @property {any} app 应用实例
      */
-    public app: CoreApp;
+    public app: any;
 
     /**
      * constructor
      *
-     * @param {AppConfig} config 配置信息
+     * @param {any} application 应用实例
      */
-    constructor(config: AppConfig) {
-        if(undefined === config) {
-            throw new InvalidConfigException('The app config is required');
-        }
-
-        this.config = config;
+    constructor(application) {
         this.server = null;
-        this.app = new WebApp(config);
+        this.app = application;
     }
 
     // web

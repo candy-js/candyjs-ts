@@ -61,14 +61,22 @@ export default class Logger {
     /**
      * constructor
      */
-    constructor(settings) {
+    constructor(settings: any) {
         this.messages = [];
 
         this.flushInterval = 10;
 
         this.targets = [];
 
-        if(undefined === settings || undefined === settings.targets) {
+        this.init(settings);
+    }
+
+    public init(settings: any) {
+        if(undefined === settings) {
+            return;
+        }
+
+        if(undefined === settings.targets) {
             throw new InvalidConfigException('No log targets found');
         }
         if(undefined !== settings.flushInterval) {
@@ -167,7 +175,9 @@ export default class Logger {
      * @param {String} message the message to be logged
      */
     public trace(message: string): void {
-        this.log(message, Logger.LEVEL_TRACE);
+        if(Candy.app.debug) {
+            this.log(message, Logger.LEVEL_TRACE);
+        }
     }
 
     /**
