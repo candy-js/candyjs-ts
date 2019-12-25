@@ -5,6 +5,7 @@
 import * as http from 'http';
 
 import Hook from'./core/Hook';
+import Logger from './log/Logger';
 
 /**
  * 入口
@@ -22,6 +23,11 @@ export default class CandyJs {
     public app: any;
 
     /**
+     * @property {Logger} _logger 日志对象
+     */
+    private static _logger: Logger;
+
+    /**
      * constructor
      *
      * @param {any} application 应用实例
@@ -29,6 +35,26 @@ export default class CandyJs {
     constructor(application) {
         this.server = null;
         this.app = application;
+    }
+
+    /**
+     * 后去日志对象
+     */
+    public static getLogger() {
+        if(null === CandyJs._logger) {
+            CandyJs._logger = Logger.getLogger();
+        }
+
+        return CandyJs._logger;
+    }
+
+    /**
+     * 设置日志对象
+     *
+     * @param {any} logger 日志对象
+     */
+    static setLogger(logger: any) {
+        CandyJs._logger = logger;
     }
 
     // web
