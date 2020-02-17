@@ -3,13 +3,13 @@
  * @license MIT
  */
 import Candy from '../Candy';
-import Fate from './Fate';
+import Event from './Event';
 import InvalidConfigException from './InvalidConfigException';
 
 /**
  * 应用基类
  */
-export default abstract class Application extends Fate {
+export default abstract class Application extends Event {
 
     /**
      * @property {String} encoding 编码
@@ -27,11 +27,6 @@ export default abstract class Application extends Fate {
     public exceptionHandler: string;
 
     /**
-     * @property {String} viewHandler 视图类
-     */
-    public viewHandler: string;
-
-    /**
      * constructor
      *
      * @param {any} config 配置信息
@@ -41,12 +36,10 @@ export default abstract class Application extends Fate {
 
         this.encoding = 'UTF-8';
         this.debug = false;
-        this.exceptionHandler = '';
-        this.viewHandler = '';
+        this.exceptionHandler = 'candy/web/ExceptionHandler';
 
         Candy.app = this;
         this.init(config);
-        Candy.config(this, config);
     }
 
     /**
@@ -64,8 +57,6 @@ export default abstract class Application extends Fate {
             this.setAppPath(config.appPath);
             delete config.appPath;
 
-        } else {
-            throw new InvalidConfigException('The "appPath" configuration is required');
         }
 
         if(undefined !== config.runtimePath) {

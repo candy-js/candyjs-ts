@@ -6,12 +6,12 @@ import * as http from 'http';
 
 import Candy from '../Candy';
 import Router from '../core/Router';
-import CoreRest from '../core/RestApplication';
+import CoreApp from '../core/Application';
 import StringHelper from '../helpers/StringHelper';
 import InvalidCallException from '../core/InvalidCallException';
 import Request from './Request';
 
-export default class RestApplication extends CoreRest {
+export default class RestApplication extends CoreApp {
 
     /**
      * @property {String} separator class and method separate
@@ -46,7 +46,6 @@ export default class RestApplication extends CoreRest {
     constructor(config) {
         super(config);
 
-        this.defaultExceptionHandler = 'candy/web/ExceptionHandler';
         this.methods = {
             GET: [],
             POST: [],
@@ -57,8 +56,7 @@ export default class RestApplication extends CoreRest {
             OPTIONS: []
         };
 
-        this.config = config;
-        this.server = null;
+        Candy.config(this, config);
     }
 
     /**
@@ -238,11 +236,58 @@ export default class RestApplication extends CoreRest {
      * @inheritdoc
      */
     public handlerException(response, exception) {
-        var handler = Candy.createObject('' === this.exceptionHandler
-            ? this.defaultExceptionHandler
-            : this.exceptionHandler);
+        let handler = Candy.createObject(this.exceptionHandler);
 
         handler.handlerException(response, exception);
+    }
+
+    /**
+     * get
+     */
+    get(pattern, handler) {
+        this.addRoute('GET', pattern, handler);
+    }
+
+    /**
+     * post
+     */
+    post(pattern, handler) {
+        this.addRoute('POST', pattern, handler);
+    }
+
+    /**
+     * put
+     */
+    put(pattern, handler) {
+        this.addRoute('PUT', pattern, handler);
+    }
+
+    /**
+     * delete
+     */
+    delete(pattern, handler) {
+        this.addRoute('DELETE', pattern, handler);
+    }
+
+    /**
+     * patch
+     */
+    patch(pattern, handler) {
+        this.addRoute('PATCH', pattern, handler);
+    }
+
+    /**
+     * head
+     */
+    head(pattern, handler) {
+        this.addRoute('HEAD', pattern, handler);
+    }
+
+    /**
+     * options
+     */
+    options(pattern, handler) {
+        this.addRoute('OPTIONS', pattern, handler);
     }
 
 }

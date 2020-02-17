@@ -2,9 +2,6 @@
  * @author
  * @license MIT
  */
-import Rest from './core/RestApplication';
-import CoreApp from './core/Application';
-import StringHelper from './helpers/StringHelper';
 
 /**
  * 辅助类
@@ -12,14 +9,9 @@ import StringHelper from './helpers/StringHelper';
 export default class Candy {
 
     /**
-     * @property {CoreApp} app 应用实例
+     * @property {Application} app 应用实例
      */
-    public static app: CoreApp = null;
-
-    /**
-     * @property {Rest} rest
-     */
-    public static rest: Rest = null;
+    public static app: any = null;
 
     /**
      * @property {Object} pathAliases 路径别名
@@ -71,7 +63,11 @@ export default class Candy {
             return;
         }
 
-        Candy.pathAliases[alias] = StringHelper.rTrimChar(path, '/');
+        if('/' === path.charAt(path.length - 1)) {
+            path = path.substring(0, path.length - 1);
+        }
+
+        Candy.pathAliases[alias] = path;
     }
 
     /**

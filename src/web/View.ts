@@ -25,23 +25,19 @@ export default class View extends CoreView {
     public getTemplateFilePath(view: string): string {
         let app = Candy.app;
         let context = this.context;
-        let path = '';
 
         // 模块无子目录 普通控制器有子目录
         if('' !== context['moduleId']) {
-            path = app.modules[context['moduleId']]
+            return app.modules[context['moduleId']]
                 + '/views/'
-                + view + View.defaultViewExtension;
-
-        } else {
-            path = app.getAppPath()
-                + '/views/'
-                + ('' === context['viewPath'] ? '.' : context['viewPath'])
-                + '/'
                 + view + View.defaultViewExtension;
         }
 
-        return path;
+        return app.getAppPath()
+            + '/views/'
+            + context.viewPath
+            + '/'
+            + view + View.defaultViewExtension;
     }
 
     /**
