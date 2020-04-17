@@ -5,11 +5,11 @@
 import * as http from 'http';
 
 import Candy from '../Candy';
-import Router from '../core/Router';
 import CoreApp from '../core/Application';
 import StringHelper from '../helpers/StringHelper';
 import InvalidCallException from '../core/InvalidCallException';
 import Request from './Request';
+import RegExpRouter from '../utils/RegExpRouter';
 
 export default class RestApplication extends CoreApp {
 
@@ -66,37 +66,30 @@ export default class RestApplication extends CoreApp {
      * @param {Object} response
      */
     public requestListener(request, response) {
-        var route = Request.parseUrl(request).pathname;
-
-        // {paramValues, handler}
-        var ret = this.resolveRoutesCombine(route, request.method);
+        let route = Request.parseUrl(request).pathname;
+        let ret = this.resolveRoutes(route, request.method);
 
         if(null === ret) {
             throw new InvalidCallException('The REST route: ' + route + ' not found');
         }
 
-        var args = null === ret.paramValues ? [null] : ret.paramValues;
-
         // handler is function
         if('function' === typeof ret.handler) {
-            ret.handler(request, response, ...args);
+            ret.handler(request, response, ret.paramValues);
 
             return;
         }
 
         // handler is string
-        var pos = ret.handler.indexOf(RestApplication.separator);
-        var obj = null;
+        let pos = ret.handler.indexOf(RestApplication.separator);
+        let obj = null;
         if(-1 === pos) {
             obj = Candy.createObject(ret.handler);
-            obj.index(request, response, ...args);
+            obj.run(request, response, ret.paramValues);
 
         } else {
             obj = Candy.createObject( ret.handler.substring(0, pos) );
-            obj[ ret.handler.substring(pos + 1) ](
-                request,
-                response,
-                ...args);
+            obj[ ret.handler.substring(pos + 1) ](request, response, ret.paramValues);
         }
     }
 
@@ -107,110 +100,111 @@ export default class RestApplication extends CoreApp {
      * @param {String} httpMethod 请求方法
      * @return {Object | null}
      */
-    public resolveRoutesCombine(route, httpMethod): any {
-        var ret = null;
-
-        // [ {pattern, handler} ... ]
-        var handlers = this.methods[httpMethod];
-        var tmp = {};
-        for(let i=0,len=handlers.length; i<len; i++) {
-            tmp[handlers[i].pattern] = handlers[i].handler;
+    public resolveRoutes(route: string, httpMethod: string): any {
+        let routesMap = this.methods[httpMethod];
+        if(0 === routesMap.length) {
+            return null;
         }
-        // {pattern, params, handler}
-        var combinedRoute = this.combineRoutes(tmp);
 
-        var matches = route.match( new RegExp('(?:' + combinedRoute.pattern + ')$') );
+        let routes = [];
+        for(let i=0,len=routesMap.length; i<len; i++) {
+            routes.push(routesMap[i].route);
+        }
 
-        // 路由成功匹配
-        if(null !== matches) {
-            ret = {};
+        let combinedRoute = new RegExpRouter().combineRoutes(routes);
+        let matches = new RegExp(combinedRoute.pattern).exec(route);
+        // 没有匹配到路由
+        if(null === matches) {
+            return null;
+        }
 
-            var subPatternPosition = -1;
-            // matches: [ 'xyz/other', undefined, undefined, undefined, 'xyz/other']
-            for(let i=1,len=matches.length; i<len; i++) {
-                if(undefined !== matches[i]) {
-                    subPatternPosition = i;
-                    break;
-                }
-            }
+        // 匹配到路由
+        let matchedPosition = this.getMatchedSubPatternPosition(matches);
+        let segmentPosition = -1 === matchedPosition
+            ? this.getMatchedRoutePositionByInput(routes, matches.input)
+            : this.getMatchedRoutePositionBySubPattern(combinedRoute.pattern, matchedPosition);
 
-            var matchedRouteSegment = this.getMatchedSegmentBySubPatternPosition(
-                combinedRoute, subPatternPosition);
+        let paramValues = null;
+        let paramNames = combinedRoute.params[segmentPosition];
+        if(null !== paramNames) {
+            paramValues = {};
 
-            ret.handler = combinedRoute.handler[matchedRouteSegment];
-            ret.paramValues = null;
-
-            // 有参数
-            if(null !== combinedRoute.params[matchedRouteSegment]) {
-                // ret.paramValues = new Array(combinedRoute.params[matchedRouteSegment].length);
-                ret.paramValues = [];
-                for(let i=0,len=combinedRoute.params[matchedRouteSegment].length; i<len; i++) {
-                    // ret.paramValues[i] = matches[subPatternPosition + i + 1];
-                    ret.paramValues.push( matches[subPatternPosition + i + 1] );
-                }
+            for(let i=0,len=paramNames.length; i<len; i++) {
+                paramValues[ paramNames[i] ] =
+                    matches[matchedPosition + i];
             }
         }
 
-        return ret;
+        return {
+            handler: routesMap[segmentPosition].handler,
+            paramValues: paramValues
+        };
     }
 
     /**
-     * 合并路由
-     *
-     * @param {Object} routes
-     *
-     * { pattern: any ... }
-     *
-     * @return {Object}
-     *
-     * eg.
-     *
-     * {
-     *   pattern: '(abc\\/(\\d+))|(abc)|(xyz\\/other)',
-     *   params: [ [ 'id' ], null, null ],
-     *   handler: any
-     * }
-     *
+     * 获取子模式位置
      */
-    public combineRoutes(routes): any {
-        var ret: any = {};
-        var patternArray = [];
-        var paramArray = [];
-        var handler = [];  // 路由配置
+    getMatchedSubPatternPosition(matches: any[]) {
+        let subPatternPosition = -1;
 
-        var parsedRoute = null;
-        for(let reg in routes) {
-            parsedRoute = Router.parse(reg);
-
-            // 为每个模式添加一个括号 用于定位匹配到的是哪一个模式
-            patternArray.push( '(' + parsedRoute.pattern + ')' );
-            paramArray.push(parsedRoute.params);
-            handler.push(routes[reg]);
+        // matches: [ '/path/123', undefined, '/path/123', 123]
+        for(let i=1,len=matches.length; i<len; i++) {
+            if(undefined !== matches[i]) {
+                subPatternPosition = i;
+                break;
+            }
         }
 
-        ret.pattern = patternArray.join('|');
-        ret.params = paramArray;
-        ret.handler = handler;
-
-        return ret;
+        return subPatternPosition;
     }
 
     /**
-     * 查找匹配的路由的位置
+     * 查找匹配的路由位置
+     */
+    getMatchedRoutePositionByInput(routes: any[], input: string) {
+        let index = 0;
+
+        let str = StringHelper.trimChar(input, '/');
+        for(let i=0, len=routes.length; i<len; i++) {
+            if( str === StringHelper.trimChar(routes[i], '/') ) {
+                index = i;
+                break;
+            }
+        }
+
+        return index;
+    }
+
+    /**
+     * 查找匹配的路由位置
      *
-     * @param {Object} combinedRoute 合并的路由
+     * @param {String} pattern 合并的模式路由
      * @param {Number} subPatternPosition 匹配的子模式位置
      * @return {Number}
      */
-    public getMatchedSegmentBySubPatternPosition(combinedRoute, subPatternPosition): number {
-        // '(' 在 pattern 中第 subPatternPosition 次出现的位置
-        // 用于确定当前路由匹配的是第几部分
-        var segment = StringHelper.nIndexOf(combinedRoute.pattern, '(', subPatternPosition);
-        var tmpLine = combinedRoute.pattern.substring(0, segment).match(/\|/g);
-        // 没有匹配到竖线 说明匹配的是第一部分
-        segment = null === tmpLine ? 0 : tmpLine.length;
+    getMatchedRoutePositionBySubPattern(pattern: string, subPatternPosition: number) {
+        let find = 0;
+        let str = '';
 
-        return segment;
+        for(let i=0, len=pattern.length - 1; i<len; i++) {
+            if('(' === pattern[i] && '?' !== pattern[i + 1]) {
+                find += 1;
+            }
+
+            if(find === subPatternPosition) {
+                str = pattern.substring(0, i);
+                break;
+            }
+        }
+
+        find = 0;
+        for(let i=0, len=str.length; i<len; i++) {
+            if('|' === str[i]) {
+                find += 1;
+            }
+        }
+
+        return find;
     }
 
     /**

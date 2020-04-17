@@ -103,7 +103,7 @@ export default class Target extends ImplTarget {
     /**
      * 写日志
      */
-    private writeLog(messages) {
+    private writeLog(messages: any[]) {
         let msg = this.formatMessage(messages);
         let file = this.logPath + '/' + this.logFile;
 
@@ -132,5 +132,5 @@ export default class Target extends ImplTarget {
             });
         });
     }
-    
+
 }

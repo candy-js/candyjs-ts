@@ -5,9 +5,9 @@
 export default class Hook {
 
     /**
-     * @property {Hook} _instance 实例
+     * @property {any[]} handlers
      */
-    public static _instance: Hook = null;
+    private static handlers: any[] = [];
 
     /**
      * @property {Number} index
@@ -15,9 +15,14 @@ export default class Hook {
     public index: number;
 
     /**
-     * @property {any[]} handlers
+     * @property {any} request
      */
-    public handlers: any[];
+    public req: any;
+
+    /**
+     * @property {any} response
+     */
+    public res: any;
 
     /**
      * @property {any} callback
@@ -25,45 +30,36 @@ export default class Hook {
     public callback: any;
 
     /**
-     * constructor
-     */
-    private constructor() {
-        this.index = 0;
-        this.handlers = [];
-        this.callback = null;
-    }
-
-    /**
-     * 获取 Hook 实例
-     */
-    public static getInstance(): Hook {
-        if(null === Hook._instance) {
-            Hook._instance = new Hook();
-        }
-
-        return Hook._instance;
-    }
-
-    /**
      * 注册
      *
      * @param {any} handler
      */
-    public addHook(handler: any) {
-        this.handlers.push(handler);
+    public static addHook(handler: any) {
+        Hook.handlers.push(handler);
+    }
+
+    /**
+     * constructor
+     */
+    public constructor() {
+        this.index = 0;
+
+        this.req = null;
+        this.res = null;
+        this.callback = null;
     }
 
     /**
      * 获取一个 handler
      */
     public getHook(): any {
-        if(this.index === this.handlers.length) {
+        if(this.index === Hook.handlers.length) {
             this.index = 0;
 
             return null;
         }
 
-        let ret: any = this.handlers[this.index];
+        let ret = Hook.handlers[this.index];
         this.index++;
 
         return ret;
@@ -77,29 +73,30 @@ export default class Hook {
      * @param {Function} callback
      */
     public trigger(req: any, res: any, callback: any) {
-        let first: any = this.getHook();
-
+        this.req = req;
+        this.res = res;
         this.callback = callback;
 
+        let first = this.getHook();
         // 没有插件
         if(null === first || 'function' !== typeof first) {
-            callback(req, res, null);
+            callback(req, res);
             return;
         }
 
-        this.triggerHook(req, res, first);
+        this.triggerHook(first);
     }
 
-    public triggerHook(req: any, res: any, next: any) {
-        next(req, res, () => {
-            let nextHandler: any = this.getHook();
+    public triggerHook(next: any) {
+        next(this.req, this.res, () => {
+            let nextHandler = this.getHook();
 
             if(null !== nextHandler && 'function' === typeof nextHandler) {
-                this.triggerHook(req, res, nextHandler);
+                this.triggerHook(nextHandler);
                 return;
             }
 
-            this.callback(req, res, null);
+            this.callback(this.req, this.res);
         });
     }
 

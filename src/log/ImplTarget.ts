@@ -23,7 +23,7 @@ export default abstract class ImplTarget extends Event implements ITarget {
     /**
      * @inheritdoc
      */
-    public flush(messages: any[]): void {};
+    public flush(messages: any[]): void {}
 
     /**
      * 触发事件
@@ -32,11 +32,13 @@ export default abstract class ImplTarget extends Event implements ITarget {
      * @param {Array} param 日志信息
      */
     trigger(eventName: string, param: any[]): void {
-        if(undefined === this.handlers[eventName]) {
+        const handlers = this.eventsMap.get(eventName);
+
+        if(undefined === handlers) {
             return;
         }
 
-        for(let handler of this.handlers[eventName]) {
+        for(let handler of handlers) {
             handler.flush(param);
         }
     }

@@ -33,7 +33,7 @@ export default class Behavior {
      *
      */
     public events(): any {
-        return {};
+        return null;
     }
 
     /**
@@ -45,6 +45,10 @@ export default class Behavior {
         this.component = component;
 
         let events = this.events();
+
+        if(null === events) {
+            return;
+        }
 
         for(let eventName in events) {
             this.component.on(eventName, events[eventName]);
@@ -60,6 +64,10 @@ export default class Behavior {
         }
 
         let events = this.events();
+
+        if(null === events) {
+            return;
+        }
 
         for(let eventName in events) {
             this.component.off(eventName, events[eventName]);

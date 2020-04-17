@@ -28,16 +28,7 @@ export default class Request extends CoreRequest {
      * @return {any}
      */
     public static parseUrl(request: http.ServerRequest): any {
-        let obj = url.parse(request.url);
-
-        return {
-            protocol: obj.protocol,
-            host: obj.host,
-            hash: obj.hash,
-            query: obj.query,
-            additionalQuery: undefined === request['additionalQuery'] ? null : request['additionalQuery'],
-            pathname: obj.pathname
-        };
+        return url.parse(request.url);
     }
 
     /**
@@ -60,24 +51,24 @@ export default class Request extends CoreRequest {
      *
      * @param {Object} request 请求对象
      * @param {String} param 参数名
+     * @param {any} defaultValue 默认值
      * @return {any}
      */
-    public static getQueryString(request: http.ServerRequest, param: string): any {
-        let parsed = Request.parseUrl(request);
+    public static getQueryString(request: http.ServerRequest, param: string, defaultValue = null): any {
+        let parsed = url.parse(request.url);
+
+        if(null === parsed.query) {
+            return defaultValue;
+        }
 
         // 查找参数
-        if(null !== parsed.query &&
-            (0 === parsed.query.indexOf(param) ||
-                parsed.query.indexOf('&' + param) > 0)) {
+        if(0 === parsed.query.indexOf(param + '=')
+            || parsed.query.indexOf('&' + param + '=') > 0) {
 
             return querystring.parse(parsed.query)[param];
         }
 
-        if(null !== parsed.additionalQuery) {
-            return parsed.additionalQuery[param];
-        }
-
-        return null;
+        return defaultValue;
     }
 
     /**
@@ -85,14 +76,15 @@ export default class Request extends CoreRequest {
      *
      * @param {http.ServerRequest} request 请求对象
      * @param {String} param 参数名
+     * @param {any} defaultValue 默认值
      * @return {any}
      */
-    public static getParameter(request: http.ServerRequest, param: string): any {
+    public static getParameter(request: http.ServerRequest, param: string, defaultValue = null): any {
         if(undefined === request['body']) {
-            return null;
+            return defaultValue;
         }
 
-        return request['body'][param];
+        return undefined === request['body'][param] ? defaultValue : request['body'][param];
     }
 
     /**
@@ -113,35 +105,7 @@ export default class Request extends CoreRequest {
      * @return {any}
      */
     public getQueryString(param: string): any {
-        var parsed = Request.parseUrl(this.request);
-
-        // 查找参数
-        if(null !== parsed.query &&
-            (0 === parsed.query.indexOf(param) ||
-                parsed.query.indexOf('&' + param) > 0)) {
-
-            return querystring.parse(parsed.query)[param];
-        }
-
-        if(null !== parsed.additionalQuery) {
-            return parsed.additionalQuery[param];
-        }
-
-        return null;
-    }
-
-    /**
-     * 设置 get 参数
-     *
-     * @param {String} param 参数名
-     * @param {String} value 参数值
-     */
-    public setQueryString(param: string, value: string): void {
-        if(undefined === this.request['additionalQuery']) {
-            this.request['additionalQuery'] = {};
-        }
-
-        this.request['additionalQuery'][param] = value;
+        return Request.getQueryString(this.request, param);
     }
 
     /**
@@ -151,11 +115,7 @@ export default class Request extends CoreRequest {
      * @return {String | null | undefined}
      */
     public getParameter(param: string): any {
-        if(undefined === this.request['body']) {
-            return null;
-        }
-
-        return this.request['body'][param];
+        return Request.getParameter(this.request, param);
     }
 
     /**

@@ -4,6 +4,8 @@
  */
 import * as http from 'http';
 
+import Application from './core/Application';
+
 import Hook from'./core/Hook';
 import Logger from './log/Logger';
 
@@ -18,9 +20,9 @@ export default class CandyJs {
     public server: http.Server;
 
     /**
-     * @property {any} app 应用实例
+     * @property {Application} app 应用实例
      */
-    public app: any;
+    public app: Application;
 
     /**
      * @property {Logger} _logger 日志对象
@@ -32,7 +34,7 @@ export default class CandyJs {
      *
      * @param {any} application 应用实例
      */
-    constructor(application) {
+    constructor(application: Application) {
         this.server = null;
         this.app = application;
     }
@@ -69,8 +71,8 @@ export default class CandyJs {
 
     // handler
     public handler(req: http.ServerRequest, res: http.ServerResponse) {
-        Hook.getInstance().trigger(req, res, () => {
-            this.requestListener(req, res);
+        new Hook().trigger(req, res, (request, response) => {
+            this.requestListener(request, response);
         });
     }
 
