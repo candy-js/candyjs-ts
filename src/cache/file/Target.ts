@@ -4,10 +4,10 @@
  */
 import * as fs from 'fs';
 
-import Candy from '../../Candy';
-import FileHelper from '../../helpers/FileHelper';
-import CacheException from '../../core/CacheException';
-import ImplTarget from '../ImplTarget';
+import Candy = require('../../Candy');
+import FileHelper = require('../../helpers/FileHelper');
+import CacheException = require('../../core/CacheException');
+import ImplTarget = require('../ImplTarget');
 
 /**
  * 文件缓存
@@ -22,7 +22,7 @@ import ImplTarget from '../ImplTarget';
  * ```
  *
  */
-export default class Target extends ImplTarget {
+class Target extends ImplTarget {
 
      /**
      * @property {String} fileExtension 缓存文件后缀
@@ -39,7 +39,7 @@ export default class Target extends ImplTarget {
      *
      * @param {any} config
      */
-    constructor(config) {
+    public constructor(config: any) {
         super();
 
         this.fileExtension = undefined === config.fileExtension
@@ -51,7 +51,7 @@ export default class Target extends ImplTarget {
             : config.cachePath;
     }
 
-    getCacheFile(key): string {
+    getCacheFile(key: string): string {
         return this.cachePath + '/' + key + this.fileExtension;
     }
 
@@ -164,4 +164,4 @@ export default class Target extends ImplTarget {
 
 }
 
-module.exports = Target;
+export = Target;

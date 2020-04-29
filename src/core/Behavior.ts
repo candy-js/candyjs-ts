@@ -1,8 +1,8 @@
 /**
- * @author
+ * @author afu
  * @license MIT
  */
-import Component from './Component';
+import Component = require('./Component');
 
 /**
  * 所有行为类的基类
@@ -13,7 +13,7 @@ import Component from './Component';
  *
  * 行为类还能够监听组件的事件并作出响应
  */
-export default class Behavior {
+class Behavior {
 
     /**
      * @property {Component} component 拥有行为的组件
@@ -29,7 +29,10 @@ export default class Behavior {
      *
      * @return {Object}
      *
-     * {eventName: handler, ...}
+     * {
+     *      eventName1: handler1,
+     *      eventNameN: handlerN
+     * }
      *
      */
     public events(): any {
@@ -77,3 +80,5 @@ export default class Behavior {
     }
 
 }
+
+export = Behavior;

@@ -9,7 +9,7 @@ import * as http from 'http';
  *
  * name=value; Expires=expires; Path=path; Domain=domain[; secure][; httponly]
  */
-export default class Cookie {
+class Cookie {
 
     public name: string;
     public value: string;
@@ -101,3 +101,5 @@ export default class Cookie {
     }
 
 }
+
+export = Cookie;

@@ -6,13 +6,13 @@ import * as http from 'http';
 import * as url from 'url';
 import * as querystring from 'querystring';
 
-import Cookie from './Cookie';
-import CoreRequest from '../core/Request';
+import Cookie = require('./Cookie');
+import CoreRequest = require('../core/Request');
 
 /**
  * 请求
  */
-export default class Request extends CoreRequest {
+class Request extends CoreRequest {
 
     /**
      * constructor
@@ -38,9 +38,9 @@ export default class Request extends CoreRequest {
      * @return {String}
      */
     public static getClientIp(request: http.ServerRequest): string {
-        let forward = request.headers['x-forwarded-for'];
+        let forward: any = request.headers['x-forwarded-for'];
         if(undefined !== forward) {
-            return (<string>forward).substring(0, forward.indexOf(','));
+            return forward.substring(0, forward.indexOf(','));
         }
 
         return request.connection.remoteAddress;
@@ -50,11 +50,11 @@ export default class Request extends CoreRequest {
      * 静态方法 获取 get 参数
      *
      * @param {Object} request 请求对象
-     * @param {String} param 参数名
+     * @param {String} parameter 参数名
      * @param {any} defaultValue 默认值
      * @return {any}
      */
-    public static getQueryString(request: http.ServerRequest, param: string, defaultValue = null): any {
+    public static getQueryString(request: http.ServerRequest, parameter: string, defaultValue = null): any {
         let parsed = url.parse(request.url);
 
         if(null === parsed.query) {
@@ -62,10 +62,10 @@ export default class Request extends CoreRequest {
         }
 
         // 查找参数
-        if(0 === parsed.query.indexOf(param + '=')
-            || parsed.query.indexOf('&' + param + '=') > 0) {
+        if(0 === parsed.query.indexOf(parameter + '=')
+            || parsed.query.indexOf('&' + parameter + '=') > 0) {
 
-            return querystring.parse(parsed.query)[param];
+            return querystring.parse(parsed.query)[parameter];
         }
 
         return defaultValue;
@@ -75,16 +75,16 @@ export default class Request extends CoreRequest {
      * 静态方法 获取 post 参数
      *
      * @param {http.ServerRequest} request 请求对象
-     * @param {String} param 参数名
+     * @param {String} parameter 参数名
      * @param {any} defaultValue 默认值
      * @return {any}
      */
-    public static getParameter(request: http.ServerRequest, param: string, defaultValue = null): any {
-        if(undefined === request['body']) {
+    public static getParameter(request: any, parameter: string, defaultValue: any = null): any {
+        if(undefined === request.body) {
             return defaultValue;
         }
 
-        return undefined === request['body'][param] ? defaultValue : request['body'][param];
+        return undefined === request.body[parameter] ? defaultValue : request.body[parameter];
     }
 
     /**
@@ -104,8 +104,8 @@ export default class Request extends CoreRequest {
      * @param {String} param 参数名
      * @return {any}
      */
-    public getQueryString(param: string): any {
-        return Request.getQueryString(this.request, param);
+    public getQueryString(parameter: string): any {
+        return Request.getQueryString(this.request, parameter);
     }
 
     /**
@@ -114,8 +114,8 @@ export default class Request extends CoreRequest {
      * @param {String} param 参数名
      * @return {String | null | undefined}
      */
-    public getParameter(param: string): any {
-        return Request.getParameter(this.request, param);
+    public getParameter(parameter: string): any {
+        return Request.getParameter(this.request, parameter);
     }
 
     /**
@@ -125,7 +125,7 @@ export default class Request extends CoreRequest {
      * @see Cookie.getCookie
      */
     public getCookie(name: string): string {
-        return Cookie.getCookie(this.request, name);
+        return Request.getCookie(this.request, name);
     }
 
     /**
@@ -167,3 +167,5 @@ export default class Request extends CoreRequest {
     }
 
 }
+
+export = Request;

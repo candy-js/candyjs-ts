@@ -1,14 +1,14 @@
 /**
- * @author
+ * @author afu
  * @license MIT
  */
 import * as fs from 'fs';
 
-import Candy from '../../Candy';
-import Logger from '../Logger';
-import ImplTarget from '../ImplTarget';
-import FileHelper from '../../helpers/FileHelper';
-import TimeHelper from '../../helpers/TimeHelper';
+import Candy = require('../../Candy');
+import Logger = require('../Logger');
+import ImplTarget = require('../ImplTarget');
+import FileHelper = require('../../helpers/FileHelper');
+import TimeHelper = require('../../helpers/TimeHelper');
 
 /**
  * 文件日志
@@ -29,7 +29,7 @@ import TimeHelper from '../../helpers/TimeHelper';
  * ```
  *
  */
-export default class Target extends ImplTarget {
+class Target extends ImplTarget {
 
     /**
      * @property {String} absolute path of log file. default at runtime directory of the application
@@ -90,9 +90,9 @@ export default class Target extends ImplTarget {
         let msg = '';
         for(let i=0,len=messages.length; i<len; i++) {
             msg += TimeHelper.format('y-m-d h:i:s', messages[i][2])
-                + ' -- '
+                + ' [ '
                 + Logger.getLevelName(messages[i][1])
-                + ' -- '
+                + ' ] '
                 + messages[i][0]
                 + '\n';
         }
@@ -134,3 +134,5 @@ export default class Target extends ImplTarget {
     }
 
 }
+
+export = Target;

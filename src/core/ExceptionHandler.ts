@@ -1,12 +1,12 @@
 /**
- * @author
+ * @author afu
  * @license MIT
  */
 
 /**
  * 异常错误处理基类
  */
-export default abstract class ExceptionHandler {
+abstract class ExceptionHandler {
 
     /**
      * 异常处理
@@ -17,3 +17,5 @@ export default abstract class ExceptionHandler {
     public abstract handlerException(response: any, exception: Error): void;
 
 }
+
+export = ExceptionHandler;

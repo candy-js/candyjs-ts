@@ -1,18 +1,16 @@
 /**
- * @author
+ * @author afu
  * @license MIT
  */
 import * as http from 'http';
 
-import Application from './core/Application';
-
-import Hook from'./core/Hook';
-import Logger from './log/Logger';
+const Hook = require('./core/Hook');
+const Logger = require('./log/Logger');
 
 /**
  * 入口
  */
-export default class CandyJs {
+class CandyJs {
 
     /**
      * @property {http.Serve} server 配置信息
@@ -20,21 +18,21 @@ export default class CandyJs {
     public server: http.Server;
 
     /**
-     * @property {Application} app 应用实例
+     * @property {any} app 应用实例
      */
-    public app: Application;
+    public app: any;
 
     /**
      * @property {Logger} _logger 日志对象
      */
-    private static _logger: Logger;
+    private static _logger: typeof Logger;
 
     /**
      * constructor
      *
      * @param {any} application 应用实例
      */
-    constructor(application: Application) {
+    constructor(application: any) {
         this.server = null;
         this.app = application;
     }
@@ -105,3 +103,5 @@ export default class CandyJs {
     }
 
 }
+
+export = CandyJs;

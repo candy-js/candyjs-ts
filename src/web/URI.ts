@@ -18,7 +18,7 @@
  * scheme           authority              path       query   fragment
  *
  */
-export default class URI {
+class URI {
 
     /**
      * @property {String} scheme 协议
@@ -242,3 +242,5 @@ export default class URI {
     }
 
 }
+
+export = URI;

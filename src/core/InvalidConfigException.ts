@@ -1,10 +1,12 @@
 /**
- * @author
+ * @author afu
  * @license MIT
  */
-import Exception from './Exception';
+import Exception = require('./Exception');
 
 /**
  * 配置异常
  */
-export default class InvalidConfigException extends Exception {}
+class InvalidConfigException extends Exception {}
+
+export = InvalidConfigException;

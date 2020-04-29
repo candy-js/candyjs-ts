@@ -1,10 +1,12 @@
 /**
- * @author
+ * @author afu
  * @license MIT
  */
-import Exception from './Exception';
+import Exception = require('./Exception');
 
 /**
  * 缓存异常
  */
-export default class CacheException extends Exception {}
+class CacheException extends Exception {}
+
+export = CacheException;

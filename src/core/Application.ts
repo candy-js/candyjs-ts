@@ -1,15 +1,15 @@
 /**
- * @author
+ * @author afu
  * @license MIT
  */
-import Candy from '../Candy';
-import Event from './Event';
-import InvalidConfigException from './InvalidConfigException';
+import Candy = require('../Candy');
+import Event = require('./Event');
+import InvalidConfigException = require('./InvalidConfigException');
 
 /**
  * 应用基类
  */
-export default abstract class Application extends Event {
+abstract class Application extends Event {
 
     /**
      * @property {String} encoding 编码
@@ -73,7 +73,7 @@ export default abstract class Application extends Event {
             delete config.rootPath;
 
         } else {
-            this.setRootPath(process.env['PWD']);
+            this.setRootPath(process.env.PWD);
         }
     }
 
@@ -148,3 +148,5 @@ export default abstract class Application extends Event {
     public abstract handlerException(response: any, exception: Error);
 
 }
+
+export = Application;

@@ -4,13 +4,13 @@
  */
 import * as http from 'http';
 
-import Candy from '../Candy';
-import CoreExceptionHandler from '../core/ExceptionHandler';
+import Candy = require('../Candy');
+import CoreExceptionHandler = require('../core/ExceptionHandler');
 
 /**
  * web 异常错误处理
  */
-export default class ExceptionHandler extends CoreExceptionHandler {
+class ExceptionHandler extends CoreExceptionHandler {
 
     /**
      * @inheritdoc
@@ -25,3 +25,5 @@ export default class ExceptionHandler extends CoreExceptionHandler {
     }
 
 }
+
+export = ExceptionHandler;

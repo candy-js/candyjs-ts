@@ -1,13 +1,65 @@
 /**
- * @author
+ * @author afu
  * @license MIT
  */
-import StringHelper from '../helpers/StringHelper';
+import StringHelper = require('../helpers/StringHelper');
 
 /**
  * 正则路由
  */
-export default class RegExpRouter {
+class RegExpRouter {
+
+    /**
+     * @property {Array} routesMap
+     *
+     * [
+     *      {route: '/home', handler: func1},
+     *      {route: '/user/{uid}', handler: func2},
+     * ]
+     *
+     */
+    public routesMap: any;
+
+    /**
+     * @property {String} combinedRoutePattern
+     */
+    public combinedRoutePattern: string;
+
+    /**
+     * @property {Array} combinedRouteParameters
+     */
+    public combinedRouteParameters: any[];
+
+    public constructor(routesMap: any[]) {
+        this.routesMap = routesMap;
+        this.combinedRoutePattern = '';
+        this.combinedRouteParameters = null;
+    }
+
+    /**
+     * 合并路由
+     *
+     * @return {Object}
+     *
+     * {
+     *      pattern: '(?:\\/home\\/?$)|(?:\\/user\\/(\\d+)\\/?$)',
+     *      parameters: [ null, ['uid'] ]
+     * }
+     */
+    public combineRoutes(): void {
+        let patterns = [];
+        let parameters = [];
+
+        for(let regExp=null, i=0, len=this.routesMap.length; i<len; i++) {
+            regExp = this.toRegExpRouter(this.routesMap[i].route);
+
+            patterns.push( '(?:' + regExp.pattern + ')' );
+            parameters.push(regExp.parameters);
+        }
+
+        this.combinedRoutePattern = patterns.join('|');
+        this.combinedRouteParameters = parameters;
+    }
 
     /**
      * 解析正则路由
@@ -23,25 +75,23 @@ export default class RegExpRouter {
      *
      * @return {Object}
      */
-    toRegExpString(patternString: string) {
-        let params = null;
+    public toRegExpRouter(patternString: string) {
+        let parameters = null;
 
-        // format /home/(uid)
+        // format /home/(uid)/(page:\\d+)
         let pattern = patternString.replace(/\{/g, '(').replace(/\}/g, ')');
+        let matchedParams = pattern.match(/\(\w+:?/g);
 
-        // search params
-        let matchedParams = pattern.match(/\([^:\)]+/g);
-
-        // replace params
+        // replace parameters
         if(null !== matchedParams) {
-            params = [];
+            parameters = [];
 
             for(let i=0,len=matchedParams.length; i<len; i++) {
                 pattern = pattern.replace(matchedParams[i], '(');
-                pattern = pattern.replace(':', '');
                 pattern = pattern.replace('()', '(\\w+)');
+                matchedParams[i] = matchedParams[i].replace(':', '');
 
-                params.push( matchedParams[i].substring(1) );
+                parameters.push( matchedParams[i].substring(1) );
             }
         }
 
@@ -50,40 +100,116 @@ export default class RegExpRouter {
 
         return {
             pattern: pattern,
-            params: params
+            parameters: parameters
         };
     }
 
     /**
-     * 合并路由
+     * 执行路由匹配
      *
-     * @param {Array} routes 路由数组
-     *
-     * [ 'route1', 'route2' ]
-     *
-     * @return {Object}
-     *
-     * eg.
-     * {
-     *      pattern: '(?:xxx\\/?$)|(?:(\\d+)\\/?$)',
-     *      params: [ null, ['uid'] ]
-     * }
+     * @param {String} route 路由
+     * @return null | Object
      */
-    combineRoutes(routes: string[]) {
-        let patterns = [];
-        let params = [];
+    public exec(route: string): any {
+        let matches = new RegExp(this.combinedRoutePattern).exec(route);
 
-        for(let parsedRoute=null, i=0, len=routes.length; i<len; i++) {
-            parsedRoute = this.toRegExpString(routes[i]);
+        // 没有匹配到路由
+        if(null === matches) {
+            return null;
+        }
 
-            patterns.push( '(?:' + parsedRoute.pattern + ')' );
-            params.push(parsedRoute.params);
+        // 匹配到路由
+        let subPatternPosition = this.getSubPatternPosition(matches);
+        let routeIndex = -1 === subPatternPosition
+            ? this.getMatchedRouteIndexByPath(matches.input)
+            : this.getMatchedRouteIndexBySubPattern(subPatternPosition);
+
+        let parameters = null;
+        let parameterNames = this.combinedRouteParameters[routeIndex];
+        if(null !== parameterNames) {
+            parameters = {};
+
+            for(let i=0,len=parameterNames.length; i<len; i++) {
+                parameters[ parameterNames[i] ] =
+                    matches[subPatternPosition + i];
+            }
         }
 
         return {
-            pattern: patterns.join('|'),
-            params: params
+            handler: this.routesMap[routeIndex].handler,
+            parameters: parameters
         };
     }
 
+    /**
+     * 查找匹配到的子模式位置
+     */
+    private getSubPatternPosition(matches: any[]): number {
+        let position = -1;
+
+        // matches: [ '/path/123', undefined, '/path/123', 123]
+        for(let i=1,len=matches.length; i<len; i++) {
+            if(undefined !== matches[i]) {
+                position = i;
+                break;
+            }
+        }
+
+        return position;
+    }
+
+    /**
+     * find route position which has no parameters
+     *
+     * @param {String} path
+     * @return {Number}
+     */
+    private getMatchedRouteIndexByPath(path: string): number {
+        let index = 0;
+
+        let str = StringHelper.trimChar(path, '/');
+        for(let i=0, len=this.routesMap.length; i<len; i++) {
+            if( str === StringHelper.trimChar(this.routesMap[i].route, '/') ) {
+                index = i;
+                break;
+            }
+        }
+
+        return index;
+    }
+
+    /**
+     * 查找匹配的路由位置
+     *
+     * @param {Number} subPatternPosition 匹配的子模式位置
+     * @return {Number}
+     */
+    private getMatchedRouteIndexBySubPattern(subPatternPosition: number): number {
+        let find = 0;
+        let str = '';
+        let pattern = this.combinedRoutePattern;
+
+        for(let i=0, len=pattern.length - 1; i<len; i++) {
+            if('(' === pattern[i] && '?' !== pattern[i + 1]) {
+                find += 1;
+            }
+
+            if(find === subPatternPosition) {
+                str = pattern.substring(0, i);
+                break;
+            }
+        }
+
+        find = 0;
+        for(let i=0, len=str.length; i<len; i++) {
+            if('|' === str[i]) {
+                find += 1;
+            }
+        }
+
+        return find;
+    }
+
 }
+
+export = RegExpRouter;

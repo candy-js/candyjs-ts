@@ -1,12 +1,12 @@
 /**
- * @author
+ * @author afu
  * @license MIT
  */
 
 /**
  * String Helper
  */
-export default class StringHelper {
+class StringHelper {
 
     /**
      * 查找某字符串在另一个字符串中第 N 次出现的位置
@@ -17,7 +17,7 @@ export default class StringHelper {
      * @return {Number} 位置值
      */
     public static nIndexOf(str: string, find: string, n: number): number {
-        let x: number = str.indexOf(find);
+        let x = str.indexOf(find);
         for(let i = 1; i < n; i++) {
             x = str.indexOf(find, x + 1);
         }
@@ -80,7 +80,7 @@ export default class StringHelper {
      * @return {String} 处理后的字符串
      */
     public static ucFirst(str: string): string {
-        let ret: string = str.charAt(0).toUpperCase();
+        let ret = str.charAt(0).toUpperCase();
 
         return ret + str.substring(1);
     }
@@ -151,3 +151,5 @@ export default class StringHelper {
     }
 
 }
+
+export = StringHelper;

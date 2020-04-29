@@ -5,12 +5,12 @@
 import * as fs from 'fs';
 import * as http from 'http';
 
-import Request from '../web/Request';
+import Request = require('../web/Request');
 
 /**
  * 静态资源处理
  */
-export default class Resource {
+class Resource {
 
     /**
      * MimeType
@@ -56,7 +56,7 @@ export default class Resource {
      * }
      *
      */
-    constructor(root, options = {}) {
+    public constructor(root, options = {}) {
         this.root = root;
         this.options = options;
     }
@@ -146,7 +146,11 @@ export default class Resource {
 
         let pathname = Request.parseUrl(request).pathname;
         let mimeType = this.getMimeType(pathname);
-        pathname = (this.root + pathname).replace(/\.\.\//g, '');
+
+        pathname = (this.root + pathname).replace(/\.\./g, '');
+        while(pathname.indexOf('//') >= 0) {
+            pathname = pathname.replace('//', '/');
+        }
 
         fs.stat(pathname, (err, stats) => {
             if(null !== err) {
@@ -189,3 +193,5 @@ export default class Resource {
     }
 
 }
+
+export = Resource;

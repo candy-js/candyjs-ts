@@ -1,15 +1,15 @@
 /**
- * @author
+ * @author afu
  * @license MIT
  */
 
 /**
  * 辅助类
  */
-export default class Candy {
+class Candy {
 
     /**
-     * @property {Application} app 应用实例
+     * @property {any} app 应用实例
      */
     public static app: any = null;
 
@@ -19,9 +19,9 @@ export default class Candy {
     public static pathAliases: any = {'@candy': __dirname};
 
     /**
-     * @property {String} fileExtention 默认文件扩展名
+     * @property {String} defaultExtension 默认文件扩展名
      */
-    public static fileExtention: string = '.js';
+    public static defaultExtension: string = '.js';
 
     /**
      * @ 别名路径转换真实路径
@@ -35,8 +35,8 @@ export default class Candy {
         }
 
         // 截取开头作为别名
-        let pos: number = alias.indexOf('/');
-        let root: string = -1 === pos ? alias : alias.substring(0, pos);
+        let pos = alias.indexOf('/');
+        let root = -1 === pos ? alias : alias.substring(0, pos);
         if(undefined !== Candy.pathAliases[root]) {
             return -1 === pos ?
                 Candy.pathAliases[root] :
@@ -71,6 +71,19 @@ export default class Candy {
     }
 
     /**
+     * 删除路径别名
+     *
+     * @param {String} alias 路径别名
+     */
+    public static deletePathAlias(alias: string): void {
+        if('@' !== alias.charAt(0)) {
+            alias = '@' + alias;
+        }
+
+        delete Candy.pathAliases[alias];
+    }
+
+    /**
      * 创建对象 系统类路径约定以 candy 开头 应用类以项目目录开头
      *
      * @param {String | JSON} clazz 以某个已经定义的别名开头的类全名或带 'classPath' 键的配置
@@ -83,29 +96,41 @@ export default class Candy {
      * @param {any} params 构造函数参数
      * @return {any} 类实例
      */
-    public static createObject(clazz: any, ...params: any[]): any {
-        let realClass = '';
-        let properties = null;
-
+    public static createObject(clazz: any, ...parameters: any): any {
         if('string' === typeof clazz) {
-            realClass = Candy.getPathAlias('@' + clazz);
-
-        } else if('object' === typeof clazz && undefined !== clazz['classPath']) {
-            realClass = Candy.getPathAlias('@' + clazz['classPath']);
-
-            properties = Candy.config({}, clazz);
-            delete properties['classPath'];
+            return Candy.createObjectAsString(clazz, ...parameters);
         }
 
-        // 文件不存在抛出异常
-        // todo
+        return Candy.createObjectAsDefinition(clazz, ...parameters);
+    }
 
-        let ClassName = require(realClass + Candy.fileExtention);
-        let instance = new ClassName(...params);
+    /**
+     * 字符串方式创建对象
+     *
+     * @param {String} classPath
+     */
+    public static createObjectAsString(classPath: string, ...parameters: any) {
+        let realClass = Candy.getPathAlias('@' + classPath);
 
-        if(null !== properties) {
-            Candy.config(instance, properties);
-        }
+        let ClassName = require(realClass + Candy.defaultExtension);
+
+        return new ClassName(...parameters);
+    }
+
+    /**
+     * 配置方式创建对象
+     *
+     * @param {Object} definition
+     */
+    public static createObjectAsDefinition(definition: any, ...parameters: any) {
+        let realClass = Candy.getPathAlias('@' + definition.classPath);
+        let properties = Candy.config({}, definition);
+
+        let ClassName = require(realClass + Candy.defaultExtension);
+        let instance = new ClassName(...parameters);
+
+        delete properties.classPath;
+        Candy.config(instance, properties);
 
         return instance;
     }
@@ -116,12 +141,12 @@ export default class Candy {
      * @param {String} clazz 类全名
      */
     public static include(clazz: string): any {
-        let realClass: string = Candy.getPathAlias('@' + clazz);
+        let realClass = Candy.getPathAlias('@' + clazz);
 
         // 文件不存在抛出异常
         // todo
 
-        return require(realClass + Candy.fileExtention);
+        return require(realClass + Candy.defaultExtension);
     }
 
     /**
@@ -131,7 +156,7 @@ export default class Candy {
      * @param {Object} properties 配置项
      * @return {Object} 源对象
      */
-    public static config(object: any, properties: any): void {
+    public static config(object: any, properties: any): any {
         for(let key in properties) {
             object[key] = properties[key];
         }
@@ -141,3 +166,4 @@ export default class Candy {
 
 }
 
+export = Candy;

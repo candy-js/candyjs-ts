@@ -1,12 +1,12 @@
 /**
- * @author
+ * @author afu
  * @license MIT
  */
 
 /**
  * 时间工具
  */
-export default class TimeHelper {
+class TimeHelper {
 
     /**
      * 字符串左侧填充
@@ -70,3 +70,5 @@ export default class TimeHelper {
     }
 
 }
+
+export = TimeHelper;

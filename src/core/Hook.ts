@@ -1,8 +1,8 @@
 /**
- * @author
+ * @author afu
  * @license MIT
  */
-export default class Hook {
+class Hook {
 
     /**
      * @property {any[]} handlers
@@ -101,3 +101,5 @@ export default class Hook {
     }
 
 }
+
+export = Hook;

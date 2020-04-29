@@ -1,11 +1,13 @@
 /**
- * @author
+ * @author afu
  * @license MIT
  */
 
-import Exception from './Exception';
+import Exception = require('./Exception');
 
 /**
  * 非法调用异常
  */
-export default class InvalidCallException extends Exception {}
+class InvalidCallException extends Exception {}
+
+export = InvalidCallException;

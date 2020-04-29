@@ -4,14 +4,14 @@
  */
 import * as http from 'http';
 
-import Component from './Component';
-
-import View from './View';
+import CandyJs = require('../index');
+import Component = require('./Component');
+import View = require('./View');
 
 /**
  * 控制器基类
  */
-export default abstract class Controller extends Component {
+abstract class Controller extends Component {
 
     /**
      * @property {String} EVENT_BEFORE_ACTIONCALL
@@ -26,7 +26,7 @@ export default abstract class Controller extends Component {
     /**
      * @property {Object} context 上下文环境 用于保存当前请求相关的信息
      */
-    protected context: any;
+    public context: any;
 
     /**
      * constructor
@@ -44,7 +44,8 @@ export default abstract class Controller extends Component {
      * @param {http.ServerResponse} response
      */
     public beforeActionCall(request: http.ServerRequest, response: http.ServerResponse) {
-        this.triggerWithRestParams(Controller.EVENT_BEFORE_ACTIONCALL, request, response);
+        CandyJs.getLogger().trace('The beforeActionCall() method is called');
+        this.triggerWithRestParameters(Controller.EVENT_BEFORE_ACTIONCALL, request, response);
     }
 
     /**
@@ -54,7 +55,8 @@ export default abstract class Controller extends Component {
      * @param {http.ServerResponse} response
      */
     public afterActionCall(request: http.ServerRequest, response: http.ServerResponse) {
-        this.triggerWithRestParams(Controller.EVENT_AFTER_ACTIONCALL, request, response);
+        CandyJs.getLogger().trace('The afterActionCall() method is called');
+        this.triggerWithRestParameters(Controller.EVENT_AFTER_ACTIONCALL, request, response);
     }
 
     /**
@@ -66,6 +68,7 @@ export default abstract class Controller extends Component {
     public runControllerAction(request: http.ServerRequest, response: http.ServerResponse) {
         this.beforeActionCall(request, response);
 
+        CandyJs.getLogger().trace('Starting to run the run() method of: ' + this.constructor.name);
         this.run(request, response);
 
         this.afterActionCall(request, response);
@@ -81,9 +84,25 @@ export default abstract class Controller extends Component {
 
     /**
      * 获取视图类
-     *
-     * @return {Object}
      */
     public abstract getView(): View;
 
+    /**
+     * 设置视图类
+     *
+     * @param {Object} view
+     */
+    public abstract setView(view: any): void;
+
+    /**
+     * 渲染文件
+     *
+     * @param {String} view 视图名
+     * @param {any} parameters 参数
+     * @return string | undefined
+     */
+    public abstract render(view: string, parameters: any): void;
+
 }
+
+export = Controller;

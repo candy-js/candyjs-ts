@@ -1,5 +1,5 @@
 /**
- * @author
+ * @author afu
  * @license MIT
  */
 import * as fs from 'fs';
@@ -7,7 +7,7 @@ import * as fs from 'fs';
 /**
  * 文件处理
  */
-export default class FileHelper {
+class FileHelper {
 
     /**
      * 获取 dirname
@@ -34,7 +34,7 @@ export default class FileHelper {
      * @return {String} 转换后的路径
      */
     static normalizePath(path: string, directorySeparator: string = '/'): string {
-        let ret: string[] = [];
+        let ret = [];
 
         path = path.replace(/\\+/g, directorySeparator);
         if(directorySeparator === path.charAt(path.length - 1)) {
@@ -73,7 +73,7 @@ export default class FileHelper {
             }
 
             let parentDir = FileHelper.getDirname(dir);
-            FileHelper.createDirectory(parentDir, mode, () => {
+            FileHelper.createDirectory(parentDir, mode, (err) => {
                 fs.mkdir(dir, mode, callback);
             });
         });
@@ -109,3 +109,5 @@ export default class FileHelper {
     }
 
 }
+
+export = FileHelper;

@@ -4,22 +4,31 @@
  */
 import * as http from 'http';
 
-import Candy from '../Candy';
-import CandyJS from '../index';
-import CoreApp from '../core/Application';
-import Exception from '../core/Exception';
-import StringHelper from '../helpers/StringHelper';
-import CoreController from '../core/Controller';
-import Request from './Request';
-import InvalidRouteException from '../core/InvalidRouteException';
+import Candy = require('../Candy');
+import CandyJS = require('../index');
+import CoreApp = require('../core/Application');
+import StringHelper = require('../helpers/StringHelper');
+import WebController = require('./Controller');
+import Request = require('./Request');
+import InvalidRouteException = require('../core/InvalidRouteException');
 
 /**
  * web 应用
  */
-export default class Application extends CoreApp {
+class Application extends CoreApp {
 
     /**
      * @property {String | Object} interceptAll 拦截所有路由
+     *
+     * 'app/some/Class'
+     *
+     * or a Object config
+     *
+     * {
+     *      'classPath': 'app/some/Class',
+     *      'property': 'value'
+     * }
+     *
      */
     public interceptAll: any;
 
@@ -47,14 +56,14 @@ export default class Application extends CoreApp {
     public modules: any;
 
     /**
-     * @property {String} viewHandler 视图类
+     * @property {String} defaultView 视图类
      */
-    public viewHandler: string;
+    public defaultView: string;
 
     /**
-     * @property {String} controllerNamespace 默认控制器命名空间
+     * @property {String} defaultControllerNamespace 默认控制器命名空间
      */
-    public controllerNamespace: string;
+    public defaultControllerNamespace: string;
 
     /**
      * @property {String} defaultRoute 默认路由
@@ -69,13 +78,14 @@ export default class Application extends CoreApp {
     /**
      * @inheritdoc
      */
-    constructor(config: any) {
+    constructor(config) {
         super(config);
 
+        this.interceptAll = null;
         this.routesMap = null;
         this.modules = null;
-        this.viewHandler = 'candy/web/View';
-        this.controllerNamespace = 'app/controllers';
+        this.defaultView = 'candy/web/View';
+        this.defaultControllerNamespace = 'app/controllers';
         this.defaultRoute = 'index/index';
         this.defaultControllerId = 'index';
 
@@ -85,29 +95,35 @@ export default class Application extends CoreApp {
     /**
      * @inheritdoc
      */
-    public requestListener(request: http.ServerRequest, response: http.ServerResponse) {
+    public requestListener(request: http.ServerRequest, response: http.ServerResponse): void {
         let route = Request.parseUrl(request).pathname;
 
-        let controller: CoreController = this.createController(route);
+        CandyJS.getLogger().trace('Route requested: ' + route);
+
+        let controller = this.createController(route);
 
         if(null === controller) {
             throw new InvalidRouteException('The route requested is invalid');
         }
 
         // 是否继承自框架控制器
-        if( !(controller instanceof CoreController) ) {
-            (controller as any).run(request, response);
-
+        if( !(controller instanceof WebController) ) {
+            CandyJS.getLogger().trace('Starting to run the run() method of: ' + controller.constructor.name);
+            controller.run(request, response);
             return;
         }
 
+        CandyJS.getLogger().trace('Starting to run the runControllerAction() method of: ' + controller.constructor.name);
+
+        controller.context.request = request;
+        controller.context.response = response;
         controller.runControllerAction(request, response);
     }
 
     /**
      * @inheritdoc
      */
-    public handlerException(response: http.ServerResponse, exception: Exception) {
+    public handlerException(response: http.ServerResponse, exception: any): void {
         let handler = Candy.createObject(this.exceptionHandler);
 
         handler.handlerException(response, exception);
@@ -118,7 +134,7 @@ export default class Application extends CoreApp {
      *
      * @param {String} route 路由
      */
-    public createController(route: string) {
+    public createController(route: string): any {
         /**
          * @var {String} moduleId 当前的模块
          */
@@ -150,10 +166,6 @@ export default class Application extends CoreApp {
 
         // 拦截路由
         if(null !== this.interceptAll) {
-            CandyJS.getLogger().trace('Starting to create controller: '
-                + ('string' === typeof this.interceptAll
-                    ? this.interceptAll : this.interceptAll.classPath));
-
             return Candy.createObject(this.interceptAll);
         }
 
@@ -208,14 +220,14 @@ export default class Application extends CoreApp {
 
             CandyJS.getLogger().trace('Starting to create controller: ' + this.modules[id]);
 
-            return Candy.createObject(clazz, {
+            return Candy.createObjectAsString(clazz, {
                 moduleId: moduleId,
                 controllerId: controllerId,
                 viewPath: viewPath
             });
         }
 
-        clazz = this.controllerNamespace
+        clazz = this.defaultControllerNamespace
             + '/'
             + viewPath
             + '/'
@@ -223,7 +235,7 @@ export default class Application extends CoreApp {
 
         CandyJS.getLogger().trace('Starting to create controller: ' + clazz);
 
-        return Candy.createObject(clazz, {
+        return Candy.createObjectAsString(clazz, {
             moduleId: moduleId,
             controllerId: controllerId,
             viewPath: viewPath
@@ -231,3 +243,5 @@ export default class Application extends CoreApp {
     }
 
 }
+
+export = Application;

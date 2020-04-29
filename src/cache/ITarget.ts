@@ -1,5 +1,5 @@
 /**
- * @author
+ * @author afu
  * @license MIT
  */
 
@@ -59,4 +59,4 @@ interface ITarget {
 
 }
 
-export default ITarget;
+export = ITarget;

@@ -1,10 +1,12 @@
 /**
- * @author
+ * @author afu
  * @license MIT
  */
-import Exception from './Exception';
+import Exception = require('./Exception');
 
 /**
  * HTTP 异常
  */
-export default class HttpException extends Exception {}
+class HttpException extends Exception {}
+
+export = HttpException;

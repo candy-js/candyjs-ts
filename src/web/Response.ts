@@ -4,10 +4,10 @@
  */
 import * as http from 'http';
 
-import Candy from '../Candy';
-import CoreResponse from '../core/Response';
-import Cookie from './Cookie';
-import HttpException from '../core/HttpException';
+import Candy = require('../Candy');
+import CoreResponse = require('../core/Response');
+import Cookie = require('./Cookie');
+import HttpException = require('../core/HttpException');
 
 /**
  * HTTP response
@@ -23,7 +23,7 @@ import HttpException from '../core/HttpException';
  * response.redirect('http://foo.com');
  *
  */
-export default class Response extends CoreResponse {
+class Response extends CoreResponse {
 
     /**
      * @var Object list of HTTP status codes and the corresponding texts
@@ -318,3 +318,5 @@ export default class Response extends CoreResponse {
     }
 
 }
+
+export = Response;

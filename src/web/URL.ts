@@ -4,15 +4,15 @@
  */
 import * as http from 'http';
 
-import Request from './Request';
-import StringHelper from '../helpers/StringHelper';
+import Request = require('./Request');
+import StringHelper = require('../helpers/StringHelper');
 
 /**
  * Uniform Resource Location
  *
  * @see https://tools.ietf.org/html/rfc1738
  */
-export default class URL {
+class URL {
 
     /**
      * 创建一个 url
@@ -59,3 +59,5 @@ export default class URL {
     }
 
 }
+
+export = URL;

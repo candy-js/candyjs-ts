@@ -1,19 +1,19 @@
 /**
- * @author
+ * @author afu
  * @license MIT
  */
 
 /**
  * 异常
  */
-export default abstract class Exception extends Error {
+abstract class Exception extends Error {
 
     /**
      * constructor
      *
      * @param {String} message 错误信息
      */
-    constructor(message) {
+    public constructor(message) {
         super(message);
 
         this.name = this.constructor.name;
@@ -29,3 +29,5 @@ export default abstract class Exception extends Error {
     }
 
 }
+
+export = Exception;

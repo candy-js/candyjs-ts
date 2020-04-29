@@ -2,43 +2,62 @@
  * @author
  * @license MIT
  */
-import Candy from '../Candy';
-import View from './View';
-import CoreController from '../core/Controller';
+import Candy = require('../Candy');
+import View = require('./View');
+import CoreController = require('../core/Controller');
 
 /**
  * 控制器
  */
-export default class Controller extends CoreController {
+class Controller extends CoreController {
 
-    /**
-     * @property {View} view
-     */
     public view: View;
 
     /**
      * constructor
      */
-    constructor(context) {
+    constructor(context: any) {
         super(context);
 
         this.view = null;
     }
 
     /**
-     * @inheritdoc
+     * 获取视图类
+     *
+     * @return {Object}
      */
     public getView(): View {
         if(null === this.view) {
-            this.view = Candy.createObject(Candy.app.viewHandler, this.context);
+            this.view = Candy.createObjectAsString(Candy.app.defaultView, this.context);
         }
 
         return this.view;
     }
 
     /**
-     * @inheritdoc
+     * 设置视图类
+     *
+     * @param {Object} view
      */
-    public run() {}
+    public setView(view: any) {
+        this.view = view;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public render(view: string, parameters: any = null) {
+        this.getView().render(view, parameters);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public run(request, response) {
+        response.end('Must have a run() method in controller');
+    }
 
 }
+
+export = Controller;

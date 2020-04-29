@@ -1,5 +1,5 @@
 /**
- * @author
+ * @author afu
  * @license MIT
  */
 import * as http from 'http';
@@ -7,7 +7,7 @@ import * as http from 'http';
 /**
  * server response
  */
-export default abstract class Response {
+abstract class Response {
 
     public response: http.ServerResponse;
 
@@ -28,3 +28,5 @@ export default abstract class Response {
     public abstract send(content: string | Buffer): void;
 
 }
+
+export = Response;

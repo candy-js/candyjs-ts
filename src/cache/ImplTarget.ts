@@ -1,16 +1,16 @@
 /**
- * @author
+ * @author afu
  * @license MIT
  */
-import ITarget from './ITarget';
+import ITarget = require('./ITarget');
 
 /**
  * 缓存基类
  */
-export default abstract class ImplTarget implements ITarget {
+abstract class ImplTarget implements ITarget {
 
     /**
-     * @inheritdoc
+     * 进行初始化
      */
     public init() {}
 
@@ -32,7 +32,7 @@ export default abstract class ImplTarget implements ITarget {
     /**
      * @inheritdoc
      */
-    public abstract get(key: string, callback: any): any;
+    public abstract get(key: string, callback: any): void;
 
     /**
      * @inheritdoc
@@ -45,3 +45,5 @@ export default abstract class ImplTarget implements ITarget {
     public abstract delete(key: string, callback: any): void;
 
 }
+
+export = ImplTarget;

@@ -1,10 +1,12 @@
 /**
- * @author
+ * @author afu
  * @license MIT
  */
-import Exception from './Exception';
+import Exception = require('./Exception');
 
 /**
  * 路由异常
  */
-export default class InvalidRouteException extends Exception {}
+class InvalidRouteException extends Exception {}
+
+export = InvalidRouteException

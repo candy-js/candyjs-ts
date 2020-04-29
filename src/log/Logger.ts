@@ -2,14 +2,14 @@
  * @author
  * @license MIT
  */
-import Candy from '../Candy';
-import InvalidConfigException from '../core/InvalidConfigException';
-import ImplTarget from './ImplTarget';
+import Candy = require('../Candy');
+import InvalidConfigException = require('../core/InvalidConfigException');
+import ImplTarget = require('./ImplTarget');
 
 /**
  * 日志
  */
-export default class Logger {
+class Logger {
 
     /**
      * Logger instance
@@ -83,8 +83,9 @@ export default class Logger {
             this.flushInterval = settings.flushInterval;
         }
         for(let target in settings.targets) {
-            if(undefined !== settings.targets[target]['classPath']) {
-                let clazz = Candy.createObject(settings.targets[target]['classPath'],
+            if(undefined !== settings.targets[target].classPath) {
+                let clazz = Candy.createObjectAsString(
+                    settings.targets[target].classPath,
                     settings.targets[target]);
                 clazz.on(ImplTarget.EVENT_FLUSH, clazz);
 
@@ -100,7 +101,7 @@ export default class Logger {
      */
     public static getLogger(): Logger {
         if(null === Logger._logger) {
-            Logger._logger = new Logger(Candy.app['log']);
+            Logger._logger = new Logger(Candy.app.log);
         }
 
         return Logger._logger;
@@ -209,3 +210,5 @@ export default class Logger {
     }
 
 }
+
+export = Logger;

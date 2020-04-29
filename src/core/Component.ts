@@ -2,17 +2,17 @@
  * @author
  * @license MIT
  */
-import Candy from '../Candy';
-import Event from './Event';
-import Behavior from './Behavior';
+import Candy = require('../Candy');
+import Event = require('./Event');
+import Behavior = require('./Behavior');
 
 /**
  * 组件是实现 属性 (property) 行为 (behavior) 事件 (event) 的基类
  */
-export default class Component extends Event {
+class Component extends Event {
 
     /**
-     * @property {Map} behaviorsMap the attached behaviors
+     * @property {Map<String, any>} behaviorsMap the attached behaviors
      *
      * {
      *     'behaviorName1': BehaviorInstance1,
@@ -33,8 +33,6 @@ export default class Component extends Event {
 
     // 行为注入组件
     public injectBehaviors(): void {
-        this.ensureDeclaredBehaviorsAttached();
-
         this.ensureDeclaredBehaviorsAttached();
 
         this.behaviorsMap.forEach((v) => {
@@ -110,11 +108,11 @@ export default class Component extends Event {
      * @return {Object | null}
      */
     public detachBehavior(name: string): any {
-        let behavior = this.behaviorsMap.get(name);
-
-        if(undefined === behavior) {
+        if(!this.behaviorsMap.has(name)) {
             return null;
         }
+
+        let behavior = this.behaviorsMap.get(name);
 
         this.behaviorsMap.delete(name);
         behavior.unListen();
@@ -128,18 +126,20 @@ export default class Component extends Event {
      * @param {String} name 行为的名称
      * @param {String | Behavior} behavior
      */
-    public attachBehaviorInternal(name: string, behavior: string | Behavior): void {
+    public attachBehaviorInternal(name: string, behavior: any): void {
         if(!(behavior instanceof Behavior)) {
             behavior = Candy.createObject(behavior);
         }
 
-        if(undefined !== this.behaviorsMap.get(name)) {
+        if(this.behaviorsMap.has(name)) {
             this.behaviorsMap.get(name).unListen();
         }
 
         // 行为类可以监听组件的事件并处理
-        (behavior as Behavior).listen(this);
+        behavior.listen(this);
         this.behaviorsMap.set(name, behavior);
     }
 
 }
+
+export = Component;

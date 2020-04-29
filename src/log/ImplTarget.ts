@@ -1,14 +1,14 @@
 /**
- * @author
+ * @author afu
  * @license MIT
  */
-import Event from '../core/Event';
-import ITarget from './ITarget';
+import Event = require('../core/Event');
+import ITarget = require('./ITarget');
 
 /**
  * 日志抽象层
  */
-export default abstract class ImplTarget extends Event implements ITarget {
+abstract class ImplTarget extends Event implements ITarget {
 
     /**
      * @property {String} EVENT_FLUSH 事件
@@ -31,16 +31,17 @@ export default abstract class ImplTarget extends Event implements ITarget {
      * @param {String} eventName 事件名称
      * @param {Array} param 日志信息
      */
-    trigger(eventName: string, param: any[]): void {
-        const handlers = this.eventsMap.get(eventName);
-
-        if(undefined === handlers) {
+    trigger(eventName: string, parameter: any[]): void {
+        if(!this.eventsMap.has(eventName)) {
             return;
         }
 
+        const handlers = this.eventsMap.get(eventName);
         for(let handler of handlers) {
-            handler.flush(param);
+            handler.flush(parameter);
         }
     }
 
 }
+
+export = ImplTarget;

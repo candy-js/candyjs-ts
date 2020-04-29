@@ -1,5 +1,5 @@
 /**
- * @author
+ * @author afu
  * @license MIT
  */
 import * as http from 'http';
@@ -7,10 +7,13 @@ import * as http from 'http';
 /**
  * server request
  */
-export default class Request {
+class Request {
 
     public request: http.ServerRequest;
 
+    /**
+     * 入口脚本名字
+     */
     protected _scriptFile: string;
 
     /**
@@ -20,6 +23,7 @@ export default class Request {
      */
     constructor(request: http.ServerRequest) {
         this.request = request;
+
         this._scriptFile = '';
     }
 
@@ -29,7 +33,7 @@ export default class Request {
      * @return {String}
      */
     getScriptFile(): string {
-        if (null === this._scriptFile) {
+        if('' === this._scriptFile) {
             this._scriptFile = process.mainModule.filename;
         }
 
@@ -37,3 +41,5 @@ export default class Request {
     }
 
 }
+
+export = Request;
